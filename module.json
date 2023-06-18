@@ -1,0 +1,413 @@
+{
+   "name": "SD-1",
+   "title": "Shared Data",
+   "description": "Sharing data across worlds",
+   "authors": [
+    {
+      "name": "Axecleft",
+      "discord": "axecleft",
+      "flags": {}
+    }
+  ],
+   "version": "1.2.3",
+   "compatibility": {
+   "minimum": "0.7.5",
+   "verified": "11.302"
+  },
+"packs": [
+    {
+      "label": "Races",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "races",
+      "path": "packs/races.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Class Abilities",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "class-abilities",
+      "path": "packs/class-abilities.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Classes",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "classes",
+      "path": "packs/classes.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Bestiary",
+      "type": "Actor",
+      "module": "ShareData",
+      "name": "bestiary",
+      "path": "packs/bestiary.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Minions (Familiars, Animal Companions)",
+      "type": "Actor",
+      "module": "ShareData",
+      "name": "minions-familiars-animal-companions",
+      "path": "packs/minions-familiars-animal-companions.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Sample Characters",
+      "type": "Actor",
+      "module": "ShareData",
+      "name": "sample-characters",
+      "path": "packs/sample-characters.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Summoned Bestiary",
+      "type": "Actor",
+      "module": "ShareData",
+      "name": "summoned-bestiary",
+      "path": "packs/summoned-bestiary.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Traps",
+      "type": "Actor",
+      "module": "ShareData",
+      "name": "traps",
+      "path": "packs/traps.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Minion Classes",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "minion-classes",
+      "path": "packs/minion-classes.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Common Buffs",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "common-buffs",
+      "path": "packs/common-buffs.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Spell Items",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "spell-items",
+      "path": "packs/spell-items.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Common Auras",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "common-auras",
+      "path": "packs/common-auras.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Item Buffs",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "item-buffs",
+      "path": "packs/item-buffs.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "label": "Magic Items",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "magic-items",
+      "path": "packs/magic-items.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Racial Abilities",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "racial-abilities",
+      "path": "packs/racial-abilities.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Natural Attacks",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "natural-attacks",
+      "path": "packs/natural-attacks.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Spell-Like Abilities",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "spell-like-abilities",
+      "path": "packs/spell-like-abilities.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Spells",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "spells",
+      "path": "packs/spells.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Spell Schools and Domains",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "spell-schools-and-domains",
+      "path": "packs/spell-schools-and-domains.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Templates",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "templates",
+      "path": "packs/templates.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Powers",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "powers",
+      "path": "packs/powers.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Feats",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "feats",
+      "path": "packs/feats.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Items",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "items",
+      "path": "packs/items.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Armor and Shields",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "armor-and-shields",
+      "path": "packs/armor-and-shields.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Enhancements",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "enhancements",
+      "path": "packs/enhancements.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Weapons and Ammo",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "weapons-and-ammo",
+      "path": "packs/weapons-and-ammo.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Racial HD",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "racial-hd",
+      "path": "packs/racial-hd.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Materials",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "materials",
+      "path": "packs/materials.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Damage Types",
+      "type": "Item",
+      "module": "ShareData",
+      "name": "damage-types",
+      "path": "packs/damage-types.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Conditions",
+      "type": "JournalEntry",
+      "module": "ShareData",
+      "name": "conditions",
+      "path": "packs/conditions.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Documentation",
+      "type": "JournalEntry",
+      "module": "ShareData",
+      "name": "documentation",
+      "path": "packs/documentation.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Sample Macros",
+      "type": "Macro",
+      "module": "ShareData",
+      "name": "sample-macros",
+      "path": "packs/sample-macros.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Playlists",
+      "type": "Playlist",
+      "module": "ShareData",
+      "name": "playlists",
+      "path": "packs/playlists.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Roll Tables",
+      "type": "RollTable",
+      "module": "ShareData",
+      "name": "roll-tables",
+      "path": "packs/roll-tables.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Item Roll Tables",
+      "type": "RollTable",
+      "module": "ShareData",
+      "name": "item-roll-tables",
+      "path": "packs/item-roll-tables.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Summoning Roll Tables",
+      "type": "RollTable",
+      "module": "ShareData",
+      "name": "summoning-roll-tables",
+      "path": "packs/summoning-roll-tables.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "index": []
+    },
+    {
+      "label": "Scenes",
+      "type": "Scene",
+      "module": "ShareData",
+      "name": "scenes",
+      "path": "packs/scenes.db",
+      "system": "D35E",
+      "private": false,
+      "flags": {},
+      "package": "world"
+    }
+  ]
+ }
