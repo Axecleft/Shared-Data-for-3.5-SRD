@@ -1,1 +1,3 @@
-# Shared-Data-for-3.5-SRD
+Welcome to Axecleft's Shared Data module for the Dungeons and Dragons 3.5 SRD game system on FoundtyVTT.
+The goal of this module is to allow the user to easily share custom content data between game worlds stored in the local FoundryVTT data folders. This allows the user to create custom content in one world and have access to it in others by storing the content in the module's compendiums.
+This module will create empty compendiums that duplicate all of the system compendiums, allowing you to store data without editing the core system compendiums and risk loosing that data during a system update.
