@@ -2,7 +2,7 @@
    "name": "SD-1",
    "title": "Shared Data",
    "description": "Sharing data across worlds",
-   "manifest": "https://gitlab.com/tposney/about-time/raw/master/package/module.json",
+   "manifest": "https://github.com/Axecleft/Shared-Data-for-3.5-SRD/archive/refs/tags/module.json",
    "download": "https://github.com/Axecleft/Shared-Data-for-3.5-SRD/archive/refs/tags/1.2.3.zip",
    "authors": [
     {
