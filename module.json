@@ -1,415 +1,608 @@
 {
-   "name": "SD-1",
-   "title": "Shared Data",
-   "description": "Sharing data across worlds",
-   "manifest": "https://github.com/Axecleft/Shared-Data-for-3.5-SRD/archive/refs/tags/1.2.4/module.json",
-   "download": "https://github.com/Axecleft/Shared-Data-for-3.5-SRD/archive/refs/tags/1.2.4.zip",
-   "authors": [
+  "id": "SD-1",
+  "title": "Axecleft's Shared Data",
+  "version": "1.13.1",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
     {
       "name": "Axecleft",
       "discord": "axecleft",
       "flags": {}
     }
   ],
-   "version": "1.2.4",
-   "compatibility": {
-   "minimum": "0.7.5",
-   "verified": "11.315"
+  "flags": {
+    "canUpload": true
   },
-"packs": [
+  "packFolders": [
     {
-      "label": "Races",
-      "type": "Item",
-      "module": "ShareData",
+      "name": "Axecleft's Shared Data",
+      "sorting": "a",
+      "color": "#3b24f0",
+      "packs": [],
+      "folders": [
+          {
+              "name": "Actors",
+              "sorting": "a",
+              "color": "#1f08c9",
+              "packs": [
+                   "bestiary",
+                   "minions-familiars-animal-companions",
+                   "sample-characters",
+                   "summoned-bestiary",
+                   "traps"
+                    ],
+               "folders": []
+           },
+           {
+               "name": "Adventures",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": ["blank"],
+               "folders": []
+           },
+           {
+               "name": "Card Stacks",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": ["blank"],
+               "folders": []
+           },
+           {
+               "name": "Items",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": [
+                    "armor-and-shields",
+                    "class-abilities",
+                    "classes",
+                    "common-auras",
+                    "common-buffs",
+                    "damage-types",
+                    "enhancements",
+                    "feats",
+                    "intelligent-item-powers",
+                    "item-buffs",
+                    "items",
+                    "magic-items",
+                    "materials",
+                    "minion-classes",
+                    "natural-attacks",
+                    "powers",
+                    "races",
+                    "racial-abilities",
+                    "racial-hd",
+                    "spell-items",
+                    "spell-schools-and-domains",
+                    "spell-like-abilities",
+                    "spells",
+                    "templates",
+                    "weapons-and-ammo"
+                   ],
+               "folders": []
+           },
+           {
+               "name": "Journal Entries",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": [
+                    "conditions",
+                    "documentation"
+                   ],
+               "folders": []
+           },
+           {
+               "name": "Macros",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": [
+                    "sample-macros"
+                   ],
+               "folders": []
+           },
+           {
+               "name": "Playlists",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": [
+                    "playlists"
+                   ],
+               "folders": []
+           },
+           {
+               "name": "Roll Tables",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": [
+                    "intelligent-item-tables",
+                    "item-roll-tables",
+                    "roll-tables",
+                    "summoning-roll-tables"
+                   ],
+               "folders": []
+            },
+            {
+               "name": "Scenes",
+               "sorting": "a",
+               "color": "#1f08c9",
+               "packs": [
+                   "scenes"
+                   ],
+               "folders": []
+            }
+        ]
+      }
+    ],
+  "packs": [
+    {
       "name": "races",
-      "path": "packs/races.db",
+      "label": "Races",
+      "path": "packs/races",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Class Abilities",
-      "type": "Item",
-      "module": "ShareData",
       "name": "class-abilities",
-      "path": "packs/class-abilities.db",
+      "label": "Class Abilities",
+      "path": "packs/class-abilities",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Classes",
-      "type": "Item",
-      "module": "ShareData",
       "name": "classes",
-      "path": "packs/classes.db",
+      "label": "Classes",
+      "path": "packs/classes",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Bestiary",
-      "type": "Actor",
-      "module": "ShareData",
       "name": "bestiary",
-      "path": "packs/bestiary.db",
+      "label": "Bestiary",
+      "path": "packs/bestiary",
+      "type": "Actor",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Minions (Familiars, Animal Companions)",
-      "type": "Actor",
-      "module": "ShareData",
       "name": "minions-familiars-animal-companions",
-      "path": "packs/minions-familiars-animal-companions.db",
+      "label": "Minions (Familiars, Animal Companions)",
+      "path": "packs/minions-familiars-animal-companions",
+      "type": "Actor",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Sample Characters",
-      "type": "Actor",
-      "module": "ShareData",
       "name": "sample-characters",
-      "path": "packs/sample-characters.db",
+      "label": "Sample Characters",
+      "path": "packs/sample-characters",
+      "type": "Actor",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Summoned Bestiary",
-      "type": "Actor",
-      "module": "ShareData",
       "name": "summoned-bestiary",
-      "path": "packs/summoned-bestiary.db",
-      "system": "D35E",
-      "private": false,
-      "flags": {}
-    },
-    {
-      "label": "Traps",
+      "label": "Summoned Bestiary",
+      "path": "packs/summoned-bestiary",
       "type": "Actor",
-      "module": "ShareData",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    },
+    {
       "name": "traps",
-      "path": "packs/traps.db",
+      "label": "Traps",
+      "path": "packs/traps",
+      "type": "Actor",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Minion Classes",
-      "type": "Item",
-      "module": "ShareData",
       "name": "minion-classes",
-      "path": "packs/minion-classes.db",
+      "label": "Minion Classes",
+      "path": "packs/minion-classes",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Common Buffs",
-      "type": "Item",
-      "module": "ShareData",
       "name": "common-buffs",
-      "path": "packs/common-buffs.db",
+      "label": "Common Buffs",
+      "path": "packs/common-buffs",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Spell Items",
-      "type": "Item",
-      "module": "ShareData",
       "name": "spell-items",
-      "path": "packs/spell-items.db",
+      "label": "Spell Items",
+      "path": "packs/spell-items",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
       "flags": {}
     },
     {
-      "label": "Common Auras",
-      "type": "Item",
-      "module": "ShareData",
-      "name": "common-auras",
-      "path": "packs/common-auras.db",
-      "system": "D35E",
-      "private": false,
-      "flags": {}
-    },
-    {
-      "label": "Item Buffs",
-      "type": "Item",
-      "module": "ShareData",
-      "name": "item-buffs",
-      "path": "packs/item-buffs.db",
-      "system": "D35E",
-      "private": false,
-      "flags": {}
-    },
-    {
-      "label": "Magic Items",
-      "type": "Item",
-      "module": "ShareData",
       "name": "magic-items",
-      "path": "packs/magic-items.db",
+      "label": "Magic Items",
+      "path": "packs/magi-items",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Racial Abilities",
+      "name": "common-auras",
+      "label": "Common Auras",
+      "path": "packs/common-auras",
+      "type": "Items",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    },
+    {
+      "name": "item-buffs",
+      "label": "Item Buffs",
+      "path": "packs/item-buffs",
       "type": "Item",
-      "module": "ShareData",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    },
+    {
       "name": "racial-abilities",
-      "path": "packs/racial-abilities.db",
+      "label": "Racial Abilities",
+      "path": "packs/racial-abilities",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Natural Attacks",
-      "type": "Item",
-      "module": "ShareData",
       "name": "natural-attacks",
-      "path": "packs/natural-attacks.db",
+      "label": "Natural Attacks",
+      "path": "packs/natural-attacks",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Spell-Like Abilities",
-      "type": "Item",
-      "module": "ShareData",
       "name": "spell-like-abilities",
-      "path": "packs/spell-like-abilities.db",
+      "label": "Spell-Like Abilities",
+      "path": "packs/spell-like-abilities",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Spells",
-      "type": "Item",
-      "module": "ShareData",
       "name": "spells",
-      "path": "packs/spells.db",
+      "label": "Spells",
+      "path": "packs/spells",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Spell Schools and Domains",
-      "type": "Item",
-      "module": "ShareData",
       "name": "spell-schools-and-domains",
-      "path": "packs/spell-schools-and-domains.db",
+      "label": "Spell Schools and Domains",
+      "path": "packs/spell-schools-and-domains",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Templates",
-      "type": "Item",
-      "module": "ShareData",
       "name": "templates",
-      "path": "packs/templates.db",
+      "label": "Templates",
+      "path": "packs/templates",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Powers",
-      "type": "Item",
-      "module": "ShareData",
       "name": "powers",
-      "path": "packs/powers.db",
+      "label": "Powers",
+      "path": "packs/powers",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Feats",
-      "type": "Item",
-      "module": "ShareData",
       "name": "feats",
-      "path": "packs/feats.db",
+      "label": "Feats",
+      "path": "packs/feats",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Items",
-      "type": "Item",
-      "module": "ShareData",
       "name": "items",
-      "path": "packs/items.db",
+      "label": "Items",
+      "path": "packs/items",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Armor and Shields",
-      "type": "Item",
-      "module": "ShareData",
       "name": "armor-and-shields",
-      "path": "packs/armor-and-shields.db",
+      "label": "Armor and Shields",
+      "path": "packs/armor-and-shields",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Enhancements",
-      "type": "Item",
-      "module": "ShareData",
       "name": "enhancements",
-      "path": "packs/enhancements.db",
+      "label": "Enhancements",
+      "path": "packs/enhancements",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Weapons and Ammo",
-      "type": "Item",
-      "module": "ShareData",
       "name": "weapons-and-ammo",
-      "path": "packs/weapons-and-ammo.db",
+      "label": "Weapons and Ammo",
+      "path": "packs/weapons-and-ammo",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Racial HD",
-      "type": "Item",
-      "module": "ShareData",
       "name": "racial-hd",
-      "path": "packs/racial-hd.db",
+      "label": "Racial HD",
+      "path": "packs/racial-hd",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Materials",
-      "type": "Item",
-      "module": "ShareData",
       "name": "materials",
-      "path": "packs/materials.db",
-      "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
-    },
-    {
-      "label": "Damage Types",
+      "label": "Materials",
+      "path": "packs/materials",
       "type": "Item",
-      "module": "ShareData",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    },
+    {
       "name": "damage-types",
-      "path": "packs/damage-types.db",
+      "label": "Damage Types",
+      "path": "packs/damage-types",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Conditions",
-      "type": "JournalEntry",
-      "module": "ShareData",
       "name": "conditions",
-      "path": "packs/conditions.db",
-      "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
-    },
-    {
-      "label": "Documentation",
+      "label": "Conditions",
+      "path": "packs/conditions",
       "type": "JournalEntry",
-      "module": "ShareData",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    },
+    {
       "name": "documentation",
-      "path": "packs/documentation.db",
+      "label": "Documentation",
+      "path": "packs/documentation",
+      "type": "JournalEntry",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Sample Macros",
-      "type": "Macro",
-      "module": "ShareData",
       "name": "sample-macros",
-      "path": "packs/sample-macros.db",
+      "label": "Sample Macros",
+      "path": "packs/sample-macros",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Playlists",
-      "type": "Playlist",
-      "module": "ShareData",
       "name": "playlists",
-      "path": "packs/playlists.db",
+      "label": "Playlists",
+      "path": "packs/playlists",
+      "type": "Playlist",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Roll Tables",
-      "type": "RollTable",
-      "module": "ShareData",
       "name": "roll-tables",
-      "path": "packs/roll-tables.db",
+      "label": "Roll Tables",
+      "path": "packs/roll-tables",
+      "type": "RollTable",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Item Roll Tables",
-      "type": "RollTable",
-      "module": "ShareData",
       "name": "item-roll-tables",
-      "path": "packs/item-roll-tables.db",
-      "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
-    },
-    {
-      "label": "Summoning Roll Tables",
+      "label": "Item Roll Tables",
+      "path": "packs/item-roll-tables",
       "type": "RollTable",
-      "module": "ShareData",
-      "name": "summoning-roll-tables",
-      "path": "packs/summoning-roll-tables.db",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "index": []
+      "flags": {}
     },
     {
-      "label": "Scenes",
-      "type": "Scene",
-      "module": "ShareData",
-      "name": "scenes",
-      "path": "packs/scenes.db",
+      "name": "intelligent-item-powers",
+      "label": "Intelligent Item Powers",
+      "path": "packs/intelligent-item-powers",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "system": "D35E",
-      "private": false,
-      "flags": {},
-      "package": "world"
-    }
-  ]
- }
+      "flags": {}
+    },
+    {
+      "name": "intelligent-item-tables",
+      "label": "Intelligent Item Tables",
+      "path": "packs/itelligent-item-tables",
+      "type": "RollTable",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    },
+    {
+      "name": "summoning-roll-tables",
+      "label": "Summoning Roll Tables",
+      "path": "packs/summoning-roll-tables",
+      "type": "RollTable",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    },
+    {
+      "name": "scenes",
+      "label": "Scenes",
+      "path": "packs/scenes",
+      "type": "Scene",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "D35E",
+      "flags": {}
+    } ],
+  "description": "A module to allow material to be shared between D35E worlds"
+}
