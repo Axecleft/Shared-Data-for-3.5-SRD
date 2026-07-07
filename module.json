@@ -286,7 +286,7 @@
       "name": "common-auras",
       "label": "Common Auras",
       "path": "packs/common-auras",
-      "type": "Items",
+      "type": "Item",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
