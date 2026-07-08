@@ -1,12 +1,12 @@
 {
   "id": "SD-1",
   "title": "Axecleft's Shared Data",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
   },
-  "download": "https://github.com/Axecleft/Shared-Data-for-3.5-SRD/archive/refs/tags/1.13.1.zip",
+  "download": "https://github.com/Axecleft/Shared-Data-for-3.5-SRD/archive/refs/tags/1.13.2.zip",
   "authors": [
     {
       "name": "Axecleft",
