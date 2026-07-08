@@ -272,7 +272,7 @@
     {
       "name": "magic-items",
       "label": "Magic Items",
-      "path": "packs/magi-items",
+      "path": "packs/magic-items",
       "type": "Item",
       "ownership": {
         "PLAYER": "OBSERVER",
@@ -572,7 +572,7 @@
     {
       "name": "intelligent-item-tables",
       "label": "Intelligent Item Tables",
-      "path": "packs/itelligent-item-tables",
+      "path": "packs/intelligent-item-tables",
       "type": "RollTable",
       "ownership": {
         "PLAYER": "OBSERVER",
