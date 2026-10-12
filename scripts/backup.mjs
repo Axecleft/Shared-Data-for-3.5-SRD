@@ -1,0 +1,587 @@
+/**
+ * Axecleft's Shared Data — automatic compendium backup & restore.
+ *
+ * Foundry replaces the whole module folder when the module is updated, which
+ * wipes every compendium stored in it. This script keeps a JSON copy of every
+ * SD-1 compendium (plus the module's assets folder, e.g. scene thumbnails)
+ * OUTSIDE the module folder, in the user Data directory, and puts it back
+ * after an update.
+ *
+ *  - Auto backup:  any create/update/delete inside an SD-1 compendium is saved
+ *                  a few seconds later. A full backup also runs when a world loads.
+ *  - Auto restore: when a world loads and an SD-1 compendium is EMPTY but its
+ *                  backup is not, the backup is imported back into it.
+ *  - Manual:       Game Settings → Axecleft's Shared Data → Backup & Restore.
+ *
+ * Safety rules:
+ *  - Only the active GM runs backups/restores (no duplicate writes).
+ *  - An empty compendium never overwrites a non-empty backup during the
+ *    load-time or manual backup (that is exactly the post-update state).
+ *  - Restore only ADDS documents that are missing (matched by _id);
+ *    it never deletes or overwrites anything already in a compendium.
+ *
+ * Foundry v13. Backups live in: Data/<backup folder>/ (default axecleft-backups/SD-1)
+ */
+
+const MODULE_ID = "SD-1";
+const FORMAT_VERSION = 1;
+const DEBOUNCE_MS = 5000;
+const MAX_CHUNK_BYTES = 4 * 1024 * 1024; // keep each create batch well under the socket limit
+const MAX_CHUNK_DOCS = 100;
+
+/* Document types whose create/update/delete hooks can signal a compendium change.
+   Embedded types are included because editing e.g. an Item on a compendium Actor
+   or a Page in a compendium Journal changes the parent compendium. */
+const WATCHED_TYPES = [
+  "Actor", "Item", "JournalEntry", "JournalEntryPage", "Macro", "Playlist", "PlaylistSound",
+  "RollTable", "TableResult", "Scene", "Token", "Tile", "Wall", "AmbientLight", "AmbientSound",
+  "Note", "Drawing", "MeasuredTemplate", "Region", "ActiveEffect", "Folder", "Cards", "Card", "Adventure"
+];
+
+/* -------------------------------------------- */
+/*  Helpers                                     */
+/* -------------------------------------------- */
+
+const t = (key, data) => data ? game.i18n.format(`SD1.${key}`, data) : game.i18n.localize(`SD1.${key}`);
+const log = (...args) => console.log(`${MODULE_ID} | Backup |`, ...args);
+const warn = (...args) => console.warn(`${MODULE_ID} | Backup |`, ...args);
+
+function FP() {
+  return foundry.applications?.apps?.FilePicker?.implementation ?? globalThis.FilePicker;
+}
+
+function setting(key) {
+  return game.settings.get(MODULE_ID, key);
+}
+
+/** Backup root, relative to the user Data folder, without leading/trailing slashes. */
+function backupRoot() {
+  let root = String(setting("backupFolder") || "axecleft-backups/SD-1").trim().replace(/\\/g, "/");
+  root = root.replace(/^\/+|\/+$/g, "");
+  return root || "axecleft-backups/SD-1";
+}
+
+const moduleDir = () => `modules/${MODULE_ID}`;
+
+/** Only one client should ever write: the active GM. */
+function isResponsibleGM() {
+  if (!game.user?.isGM) return false;
+  const active = game.users.activeGM ?? game.users.find(u => u.isGM && u.active);
+  return active?.id === game.user.id;
+}
+
+function ourPacks() {
+  return game.packs.filter(p => p.metadata.packageType === "module" && p.metadata.packageName === MODULE_ID);
+}
+
+function normDir(p) {
+  return decodeURIComponent(String(p ?? "")).replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+}
+
+/** Browse a Data-relative directory. Returns null if it does not exist. */
+async function browse(dir) {
+  try {
+    const res = await FP().browse("data", dir);
+    if (normDir(res?.target) !== normDir(dir)) return null; // server fell back to another dir
+    return res;
+  } catch (err) {
+    return null;
+  }
+}
+
+const knownDirs = new Set();
+
+/** Create every segment of a Data-relative path that does not exist yet. */
+async function ensureDir(path) {
+  const parts = normDir(path).split("/").filter(Boolean);
+  let current = "";
+  for (const part of parts) {
+    current = current ? `${current}/${part}` : part;
+    if (knownDirs.has(current)) continue;
+    if (!(await browse(current))) {
+      try {
+        await FP().createDirectory("data", current, {});
+      } catch (err) {
+        // Most likely "already exists" from a race; verify below.
+        if (!(await browse(current))) throw new Error(`Could not create folder "${current}": ${err.message ?? err}`);
+      }
+    }
+    knownDirs.add(current);
+  }
+}
+
+async function uploadFile(dir, file) {
+  await ensureDir(dir);
+  const res = await FP().upload("data", dir, file, {}, { notify: false });
+  if (!res || res.status === "error") throw new Error(res?.message ?? `Upload of ${file.name} to ${dir} failed`);
+  return res;
+}
+
+async function writeJSON(dir, filename, data) {
+  const file = new File([JSON.stringify(data)], filename, { type: "application/json" });
+  return uploadFile(dir, file);
+}
+
+async function fetchData(path, as = "json") {
+  const url = foundry.utils.getRoute(encodeURI(normDir(path)));
+  const res = await fetch(`${url}?t=${Date.now()}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  return as === "json" ? res.json() : res.blob();
+}
+
+async function listFilesRecursive(dir) {
+  const res = await browse(dir);
+  if (!res) return [];
+  const files = res.files.map(normDir);
+  for (const sub of res.dirs) files.push(...await listFilesRecursive(normDir(sub)));
+  return files;
+}
+
+/** Split documents into batches limited by count and approximate JSON size. */
+function chunk(docs) {
+  const out = [];
+  let batch = [];
+  let bytes = 0;
+  for (const d of docs) {
+    const size = JSON.stringify(d).length;
+    if (batch.length && (batch.length >= MAX_CHUNK_DOCS || bytes + size > MAX_CHUNK_BYTES)) {
+      out.push(batch);
+      batch = [];
+      bytes = 0;
+    }
+    batch.push(d);
+    bytes += size;
+  }
+  if (batch.length) out.push(batch);
+  return out;
+}
+
+/** Order folders so parents are always created before their children. */
+function sortFoldersByDepth(folders) {
+  const byId = new Map(folders.map(f => [f._id, f]));
+  const depth = f => {
+    let d = 0, cur = f, guard = 0;
+    while (cur?.folder && byId.has(cur.folder) && guard++ < 50) { d++; cur = byId.get(cur.folder); }
+    return d;
+  };
+  return [...folders].sort((a, b) => depth(a) - depth(b));
+}
+
+/* -------------------------------------------- */
+/*  Serialized work queue                       */
+/* -------------------------------------------- */
+
+let queue = Promise.resolve();
+function enqueue(fn) {
+  const run = queue.then(fn);
+  queue = run.catch(err => warn(err));
+  return run;
+}
+
+/* -------------------------------------------- */
+/*  Backup manifest (status info)               */
+/* -------------------------------------------- */
+
+let manifest = null;
+
+async function loadManifest() {
+  manifest = (await fetchData(`${backupRoot()}/backup-manifest.json`).catch(() => null)) ?? { packs: {} };
+  manifest.packs ??= {};
+  return manifest;
+}
+
+async function saveManifest() {
+  manifest.format = FORMAT_VERSION;
+  manifest.module = MODULE_ID;
+  manifest.moduleVersion = game.modules.get(MODULE_ID)?.version;
+  manifest.updated = new Date().toISOString();
+  await writeJSON(backupRoot(), "backup-manifest.json", manifest);
+}
+
+/* -------------------------------------------- */
+/*  Backup                                      */
+/* -------------------------------------------- */
+
+const restorePending = new Set(); // pack collections that must not be backed up yet
+
+async function exportPack(pack) {
+  const docs = await pack.getDocuments();
+  return {
+    format: FORMAT_VERSION,
+    module: MODULE_ID,
+    moduleVersion: game.modules.get(MODULE_ID)?.version,
+    pack: pack.metadata.name,
+    type: pack.documentName,
+    exported: new Date().toISOString(),
+    folders: pack.folders.map(f => f.toObject()),
+    documents: docs.map(d => d.toObject())
+  };
+}
+
+/**
+ * Back up one compendium.
+ * @param {boolean} allowEmpty  Write even if the compendium is empty. Only true for
+ *                              changes the user made this session (e.g. deleting the last entry).
+ * @returns {Promise<{name:string, count:number, skipped?:string}>}
+ */
+async function backupPack(pack, { allowEmpty = false } = {}) {
+  const name = pack.metadata.name;
+  if (restorePending.has(pack.collection)) return { name, count: 0, skipped: "restorePending" };
+
+  const data = await exportPack(pack);
+  const isEmpty = !data.documents.length && !data.folders.length;
+  if (isEmpty && !allowEmpty) return { name, count: 0, skipped: "empty" };
+
+  await writeJSON(`${backupRoot()}/packs`, `${name}.json`, data);
+  manifest.packs[name] = {
+    label: pack.metadata.label,
+    type: pack.documentName,
+    count: data.documents.length,
+    folders: data.folders.length,
+    updated: data.exported
+  };
+  return { name, count: data.documents.length };
+}
+
+/** Copy files from modules/SD-1/assets into the backup. */
+async function backupAssets({ full = false } = {}) {
+  const src = `${moduleDir()}/assets`;
+  const files = await listFilesRecursive(src);
+  if (!files.length) return 0;
+
+  const dstRoot = `${backupRoot()}/assets`;
+  const existing = full ? new Set() : new Set(await listFilesRecursive(dstRoot));
+  let copied = 0;
+  for (const path of files) {
+    const rel = path.slice(src.length + 1);
+    const target = `${dstRoot}/${rel}`;
+    if (existing.has(target)) continue;
+    try {
+      const blob = await fetchData(path, "blob");
+      if (!blob) continue;
+      const fileName = rel.split("/").pop();
+      const dir = target.slice(0, target.length - fileName.length - 1);
+      await uploadFile(dir, new File([blob], fileName, { type: blob.type }));
+      copied++;
+    } catch (err) {
+      warn(`Asset backup failed for ${path}`, err);
+    }
+  }
+  return copied;
+}
+
+/** Full backup of every compendium. */
+async function backupAll({ manual = false } = {}) {
+  return enqueue(async () => {
+    if (!manifest) await loadManifest();
+    const results = [];
+    for (const pack of ourPacks()) {
+      try {
+        results.push(await backupPack(pack, { allowEmpty: false }));
+      } catch (err) {
+        warn(`Backup failed for ${pack.collection}`, err);
+        results.push({ name: pack.metadata.name, count: 0, skipped: "error", error: err.message });
+      }
+    }
+    const assets = await backupAssets({ full: manual });
+    await saveManifest();
+    const saved = results.filter(r => !r.skipped);
+    const errors = results.filter(r => r.skipped === "error");
+    log(`Backed up ${saved.length} compendia (${saved.reduce((n, r) => n + r.count, 0)} documents), ${assets} asset files.`, results);
+    if (manual) {
+      ui.notifications.info(t("Notify.BackupDone", { packs: saved.length, docs: saved.reduce((n, r) => n + r.count, 0), path: backupRoot() }));
+    }
+    if (errors.length) ui.notifications.error(t("Notify.BackupErrors", { packs: errors.map(e => e.name).join(", ") }));
+    return results;
+  });
+}
+
+/* Debounced per-pack backups triggered by document hooks */
+const timers = new Map();
+let assetTimer = null;
+
+function scheduleBackup(collection) {
+  if (!setting("autoBackup") || !isResponsibleGM()) return;
+  clearTimeout(timers.get(collection));
+  timers.set(collection, setTimeout(() => {
+    timers.delete(collection);
+    const pack = game.packs.get(collection);
+    if (!pack) return;
+    enqueue(async () => {
+      if (!manifest) await loadManifest();
+      const r = await backupPack(pack, { allowEmpty: true });
+      if (!r.skipped) {
+        await saveManifest();
+        log(`Auto-backup of ${collection}: ${r.count} documents.`);
+      }
+    }).catch(err => ui.notifications.error(t("Notify.BackupErrors", { packs: collection })));
+  }, DEBOUNCE_MS));
+}
+
+function scheduleAssetBackup() {
+  if (!setting("autoBackup") || !isResponsibleGM()) return;
+  clearTimeout(assetTimer);
+  // Scene thumbnails are generated a moment after the scene saves; wait a bit longer.
+  assetTimer = setTimeout(() => enqueue(() => backupAssets({ full: true })), DEBOUNCE_MS * 3);
+}
+
+function onDocumentChange(doc) {
+  const collection = doc?.pack ?? doc?.compendium?.collection;
+  if (!collection || !collection.startsWith(`${MODULE_ID}.`)) return;
+  scheduleBackup(collection);
+  if (doc.documentName === "Scene") scheduleAssetBackup();
+}
+
+/* -------------------------------------------- */
+/*  Restore                                     */
+/* -------------------------------------------- */
+
+/**
+ * Add every document/folder from the backup that is missing in the compendium.
+ * Never deletes or overwrites existing entries.
+ */
+async function restorePack(pack, data) {
+  await pack.getIndex();
+  const haveDocs = new Set(pack.index.keys());
+  const haveFolders = new Set(pack.folders.map(f => f.id));
+  const folders = sortFoldersByDepth((data.folders ?? []).filter(f => !haveFolders.has(f._id)));
+  const docs = (data.documents ?? []).filter(d => !haveDocs.has(d._id));
+  if (!folders.length && !docs.length) return { folders: 0, docs: 0 };
+
+  const wasLocked = pack.locked;
+  if (wasLocked) await pack.configure({ locked: false });
+  try {
+    const FolderCls = CONFIG.Folder.documentClass;
+    for (const f of folders) {
+      // One at a time, in depth order, so each parent exists before its children.
+      await FolderCls.createDocuments([f], { pack: pack.collection, keepId: true });
+    }
+    const DocCls = pack.documentClass;
+    for (const batch of chunk(docs)) {
+      await DocCls.createDocuments(batch, { pack: pack.collection, keepId: true });
+    }
+  } finally {
+    if (wasLocked) await pack.configure({ locked: true });
+  }
+  return { folders: folders.length, docs: docs.length };
+}
+
+/** Copy backed-up asset files that are missing from modules/SD-1/assets. */
+async function restoreAssets() {
+  const srcRoot = `${backupRoot()}/assets`;
+  const files = await listFilesRecursive(srcRoot);
+  if (!files.length) return 0;
+  const dstRoot = `${moduleDir()}/assets`;
+  const existing = new Set(await listFilesRecursive(dstRoot));
+  let copied = 0;
+  for (const path of files) {
+    const rel = path.slice(srcRoot.length + 1);
+    const target = `${dstRoot}/${rel}`;
+    if (existing.has(target)) continue;
+    try {
+      const blob = await fetchData(path, "blob");
+      if (!blob) continue;
+      const fileName = rel.split("/").pop();
+      const dir = target.slice(0, target.length - fileName.length - 1);
+      await uploadFile(dir, new File([blob], fileName, { type: blob.type }));
+      copied++;
+    } catch (err) {
+      warn(`Asset restore failed for ${path}`, err);
+    }
+  }
+  return copied;
+}
+
+/**
+ * Restore compendia from backup.
+ * @param {boolean} onlyEmpty  true = automatic mode: only touch compendia that are empty.
+ */
+async function restoreAll({ onlyEmpty = true, manual = false } = {}) {
+  return enqueue(async () => {
+    const packs = ourPacks();
+    const targets = [];
+    for (const pack of packs) {
+      await pack.getIndex();
+      if (onlyEmpty && (pack.index.size || pack.folders.size)) continue;
+      targets.push(pack);
+    }
+    // Block backups of these packs until their restore has finished.
+    targets.forEach(p => restorePending.add(p.collection));
+
+    const assets = await restoreAssets().catch(err => { warn("Asset restore failed", err); return 0; });
+
+    const restored = [];
+    const failed = [];
+    for (const pack of targets) {
+      try {
+        const data = await fetchData(`${backupRoot()}/packs/${pack.metadata.name}.json`).catch(() => null);
+        if (!data?.documents) { restorePending.delete(pack.collection); continue; }
+        const r = await restorePack(pack, data);
+        restorePending.delete(pack.collection);
+        if (r.docs || r.folders) restored.push({ name: pack.metadata.label, ...r });
+      } catch (err) {
+        warn(`Restore failed for ${pack.collection}`, err);
+        failed.push(pack.metadata.label);
+        // Leave it in restorePending so a broken/partial pack can't overwrite the good backup this session.
+      }
+    }
+
+    const docs = restored.reduce((n, r) => n + r.docs, 0);
+    if (restored.length) {
+      log("Restored:", restored);
+      ui.notifications.info(t("Notify.RestoreDone", { packs: restored.length, docs, assets }), { permanent: !manual });
+    } else if (manual) {
+      ui.notifications.info(t("Notify.RestoreNothing"));
+    }
+    if (failed.length) ui.notifications.error(t("Notify.RestoreErrors", { packs: failed.join(", ") }), { permanent: true });
+    return { restored, failed, assets };
+  });
+}
+
+/* -------------------------------------------- */
+/*  Settings menu                               */
+/* -------------------------------------------- */
+
+const { ApplicationV2, DialogV2 } = foundry.applications.api;
+
+class SharedDataBackupMenu extends ApplicationV2 {
+  static DEFAULT_OPTIONS = {
+    id: "sd1-backup-menu",
+    tag: "div",
+    window: { title: "SD1.Menu.Title", icon: "fa-solid fa-box-archive", resizable: true },
+    position: { width: 560, height: 640 },
+    actions: {
+      backupNow: SharedDataBackupMenu.#onBackup,
+      restoreNow: SharedDataBackupMenu.#onRestore,
+      refresh: SharedDataBackupMenu.#onRefresh
+    }
+  };
+
+  async _prepareContext() {
+    await loadManifest();
+    const rows = ourPacks().map(p => {
+      const b = manifest.packs[p.metadata.name];
+      return {
+        label: p.metadata.label,
+        live: p.index.size,
+        backup: b ? b.count : "—",
+        updated: b?.updated ? new Date(b.updated).toLocaleString() : "—",
+        warn: b && b.count > p.index.size
+      };
+    });
+    return { rows, root: backupRoot(), updated: manifest.updated ? new Date(manifest.updated).toLocaleString() : "—" };
+  }
+
+  async _renderHTML(context) {
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const div = document.createElement("div");
+    div.classList.add("sd1-backup");
+    div.innerHTML = `
+      <p>${t("Menu.Intro")}</p>
+      <p><strong>${t("Menu.Folder")}:</strong> <code>Data/${esc(context.root)}</code><br>
+         <strong>${t("Menu.LastBackup")}:</strong> ${esc(context.updated)}</p>
+      <div style="display:flex;gap:6px;margin:8px 0;">
+        <button type="button" data-action="backupNow"><i class="fa-solid fa-floppy-disk"></i> ${t("Menu.BackupNow")}</button>
+        <button type="button" data-action="restoreNow"><i class="fa-solid fa-rotate-left"></i> ${t("Menu.RestoreNow")}</button>
+        <button type="button" data-action="refresh"><i class="fa-solid fa-arrows-rotate"></i> ${t("Menu.Refresh")}</button>
+      </div>
+      <table style="width:100%;font-size:0.9em;">
+        <thead><tr><th style="text-align:left">${t("Menu.Compendium")}</th><th>${t("Menu.InWorld")}</th><th>${t("Menu.InBackup")}</th><th>${t("Menu.Updated")}</th></tr></thead>
+        <tbody>${context.rows.map(r => `
+          <tr${r.warn ? ' style="color:var(--color-level-warning,#c60);font-weight:bold"' : ""}>
+            <td>${esc(r.label)}</td><td style="text-align:center">${r.live}</td>
+            <td style="text-align:center">${r.backup}</td><td style="text-align:center">${esc(r.updated)}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+      <p style="font-size:0.85em;opacity:0.8">${t("Menu.Footnote")}</p>`;
+    return div;
+  }
+
+  _replaceHTML(result, content) {
+    content.replaceChildren(result);
+    content.style.overflowY = "auto";
+  }
+
+  static async #onBackup() {
+    if (!game.user.isGM) return;
+    await backupAll({ manual: true });
+    this.render();
+  }
+
+  static async #onRestore() {
+    if (!game.user.isGM) return;
+    const ok = await DialogV2.confirm({
+      window: { title: t("Menu.RestoreNow") },
+      content: `<p>${t("Menu.RestoreConfirm")}</p>`
+    });
+    if (!ok) return;
+    await restoreAll({ onlyEmpty: false, manual: true });
+    this.render();
+  }
+
+  static #onRefresh() {
+    this.render();
+  }
+}
+
+/* -------------------------------------------- */
+/*  Registration                                */
+/* -------------------------------------------- */
+
+Hooks.once("init", () => {
+  game.settings.registerMenu(MODULE_ID, "backupMenu", {
+    name: "SD1.Settings.Menu.Name",
+    label: "SD1.Settings.Menu.Label",
+    hint: "SD1.Settings.Menu.Hint",
+    icon: "fa-solid fa-box-archive",
+    type: SharedDataBackupMenu,
+    restricted: true
+  });
+  game.settings.register(MODULE_ID, "autoBackup", {
+    name: "SD1.Settings.AutoBackup.Name",
+    hint: "SD1.Settings.AutoBackup.Hint",
+    scope: "world", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MODULE_ID, "autoRestore", {
+    name: "SD1.Settings.AutoRestore.Name",
+    hint: "SD1.Settings.AutoRestore.Hint",
+    scope: "world", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MODULE_ID, "backupFolder", {
+    name: "SD1.Settings.BackupFolder.Name",
+    hint: "SD1.Settings.BackupFolder.Hint",
+    scope: "world", config: true, type: String, default: "axecleft-backups/SD-1",
+    onChange: () => { knownDirs.clear(); manifest = null; }
+  });
+
+  for (const type of WATCHED_TYPES) {
+    for (const action of ["create", "update", "delete"]) {
+      Hooks.on(`${action}${type}`, onDocumentChange);
+    }
+  }
+});
+
+Hooks.once("ready", async () => {
+  const mod = game.modules.get(MODULE_ID);
+  mod.api = {
+    backupAll: () => backupAll({ manual: true }),
+    restoreAll: (onlyEmpty = false) => restoreAll({ onlyEmpty, manual: true }),
+    openMenu: () => new SharedDataBackupMenu().render(true)
+  };
+
+  if (!isResponsibleGM()) return;
+  if (normDir(backupRoot()).startsWith(moduleDir())) {
+    ui.notifications.error(t("Notify.BadFolder"), { permanent: true });
+    return;
+  }
+
+  try {
+    await loadManifest();
+    if (setting("autoRestore")) await restoreAll({ onlyEmpty: true });
+    if (setting("autoBackup")) await backupAll();
+  } catch (err) {
+    warn("Startup backup/restore failed", err);
+    ui.notifications.error(t("Notify.StartupError"));
+  }
+});
