@@ -8,7 +8,21 @@
       },
       "AutoBackup": {
         "Name": "Automatic backup",
-        "Hint": "Save a copy of every Shared Data compendium outside the module folder whenever its contents change, and when the world loads. This lets you update the module without losing your custom content."
+        "Hint": "Keep a copy of every Shared Data compendium outside the module folder, so you can update the module without losing your custom content. When it is saved is set by \"Backup timing\" below. When a world loads, any compendium changed since its last backup is saved."
+      },
+      "BackupTiming": {
+        "Name": "Backup timing",
+        "Hint": "After each change: a compendium is saved once you have stopped editing it for the delay below. On a timer: changed compendiums are saved together every few minutes (set below), which causes fewer, larger saves during play. Changes are never forgotten either way: a compendium stays marked until it has been saved, even if Foundry is closed.",
+        "Change": "After each change",
+        "Interval": "On a timer"
+      },
+      "BackupDelay": {
+        "Name": "Delay after a change (seconds)",
+        "Hint": "Used with \"After each change\". How long to wait after the last edit before saving that compendium. A longer delay means fewer saves while you are editing a lot."
+      },
+      "BackupInterval": {
+        "Name": "Timer interval (minutes)",
+        "Hint": "Used with \"On a timer\". How often changed compendiums are saved."
       },
       "AutoRestore": {
         "Name": "Automatic restore",
@@ -17,6 +31,10 @@
       "BackupFolder": {
         "Name": "Backup folder",
         "Hint": "Folder inside your Foundry user Data directory where backups are stored. It must NOT be inside the module folder. Use the same folder in every world so they all share one backup."
+      },
+      "ShowIndicator": {
+        "Name": "Show backup activity",
+        "Hint": "Show a small \"Shared Data: backing up…\" label at the top of the screen while a backup or restore is running. Only the GM whose client does the work sees it."
       }
     },
     "Menu": {
@@ -42,6 +60,14 @@
       "RestoreErrors": "Shared Data: restore failed for {packs}. Your backup was not changed. See the browser console (F12) for details.",
       "BadFolder": "Shared Data: the backup folder is inside the module folder and would be wiped by updates. Choose another folder in Game Settings.",
       "StartupError": "Shared Data: automatic backup/restore failed. See the browser console (F12) for details."
+    },
+    "Busy": {
+      "Saving": "Shared Data: backing up…",
+      "BackingUp": "Shared Data: backing up {name}…",
+      "Assets": "Shared Data: backing up scene thumbnails…",
+      "Checking": "Shared Data: checking for changes…",
+      "Restoring": "Shared Data: restoring {name}…",
+      "Settling": "Shared Data: waiting for the game system to finish…"
     }
   }
 }
